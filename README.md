@@ -1,98 +1,183 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Nexus Wallet API
+![Node.js](https://img.shields.io/badge/node.js-20-green)
+![NestJS](https://img.shields.io/badge/nestjs-framework-red)
+![TypeScript](https://img.shields.io/badge/typescript-language-blue)
+![PostgreSQL](https://img.shields.io/badge/postgresql-database-blue)
+![Prisma](https://img.shields.io/badge/prisma-orm-2D3748)
+![Tests](https://img.shields.io/badge/tests-vitest-yellow)
+![Architecture](https://img.shields.io/badge/architecture-modular_nestjs-blue)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API desenvolvida como solução para o desafio técnico backend da Nexus.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+O sistema simula uma **carteira digital multi-token**, permitindo o gerenciamento de saldos e movimentações financeiras auditáveis.
 
-## Description
+Funcionalidades principais:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Consulta de saldo da carteira
+- Depósitos e saques
+- Quotes de conversão entre tokens
+- Execução de swaps entre moedas
+- Histórico de transações com paginação
+- Registro auditável de movimentações (ledger)
 
-## Project setup
+A API foi construída seguindo princípios de arquitetura modular e boas práticas de desenvolvimento backend.
 
+## Tecnologias
+
+- Node.js
+- NestJS
+- TypeScript
+- Prisma ORM
+- PostgreSQL
+- Swagger
+- Vitest
+
+## Estrutura do Projeto
+```
+├── prisma
+│ ├── migrations
+│ └── schema.prisma
+├── src
+│ ├── @types
+│ ├── auth
+│ ├── common
+│ ├── ledger
+│ ├── swap
+│ ├── users
+│ ├── wallet
+│ ├── webhooks
+│ ├── app.module.ts
+│ ├── main.ts
+│ ├── prisma.module.ts
+│ └── prisma.service.ts    
+```
+### Organização
+
+- **auth** → autenticação e geração de tokens  
+- **wallet** → gerenciamento de carteira e saldo  
+- **ledger** → registro de movimentações financeiras  
+- **swap** → conversão entre tokens  
+- **common** → utilidades compartilhadas  
+- **prisma** → acesso ao banco de dados
+
+## Como rodar o projeto
+
+### 1. Clonar o repositório
 ```bash
-$ npm install
+git clone https://github.com/seu-usuario/nexus-teste-backend.git
+cd nexus_teste_backend
 ```
 
-## Compile and run the project
-
+### 2. Instalar dependências
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
-
+### 3. Criar arquivo de ambiente
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cp .env.example .env
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+### 4. Rodar migrations do DB
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npx prisma migrate dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 5. Iniciar o servidor
+```bash
+npm run start:dev
+```
 
-## Resources
+### A API estará disponível em:
+```
+http://localhost:3000
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+## Variáveis de ambiente
+O projeto utiliza variáveis de ambiente para configuração.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Crie um `.env` baseado no `.env.example`.
 
-## Support
+Exemplo:
+```
+PORT=3000
+DATABASE_URL=connection_string
+JWT_SECRET=your_secret
+JWT_REFRESH_SECRET=your_refresh_secret
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Documentação da API
+A documentação interativa da API está disponível via Swagger:
+```
+http://localhost:3000/docs
+```
+Nela é possível testar todos os endpoints diretamente pelo navegador.
 
-## Stay in touch
+## Estrutura do Banco de Dados
+O banco foi modelado para representar usuários, carteiras e transações.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Tabelas principais:
 
-## License
+**users**
+```
+userId
+email
+password
+createdAt
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+**wallet**
+```
+walletId
+userId
+brlBalance
+btcBalance
+ethBalance
+```
+
+**transactions**
+```
+transactionId
+walletId
+groupId
+idempotencyKey
+type
+token
+amount
+previousBalance
+newBalance
+createAt
+```
+
+Cada usuário possui uma carteira associada que armazena os saldos dos tokens.
+
+Todas as alterações de saldo geram registros na tabela `transactions`, permitindo reconstruir o saldo da carteira a partir do histórico de movimentações (modelo de ledger auditável).
+```
+    User
+     |
+     | 1:1
+     |
+   Wallet
+     |
+     | 1:N
+     |
+Transactions
+```
+
+## Decisões Técnicas
+
+### NestJS
+Escolhida por oferecer arquitetura modular e escalável, facilitando a organização da API.
+
+### Prisma
+Facilidade de integração, tipagem automática com TypeScript e simplicidade para migrations.
+
+### Swagger
+A documentação permite visualizar os endpoints disponíveis, seus parâmetros e testar as requisições diretamente pelo navegador.
+
+### Idempotency
+Operações sensíveis como depósitos e saques utilizam `idempotencyKey` para evitar execução duplicada de requisições.
+
+### GroupId
+Operações de swap geram múltiplas transações (SWAP_OUT, SWAP_FEE, SWAP_IN).  
+O `groupId` permite agrupar essas movimentações como uma única operação lógica.

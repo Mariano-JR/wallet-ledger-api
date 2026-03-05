@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service.js';
 import { AuthLoginDto } from './dto/auth-login.dto.js';
 import { AppError } from '../common/errors/app.error.js';
+import { RefreshTokenDto } from './dto/refresh-token.dto.js';
 
 @Injectable()
 export class AuthService {

@@ -57,6 +57,7 @@ model Transactions {
   wallet          Wallet   @relation(fields: [walletId], references: [walletId])
 
   idempotencyKey  String?  @unique
+  groupId         String?
 
   type            TypeTransactions
   token           Tokens
@@ -67,5 +68,5 @@ model Transactions {
 
   createdAt       DateTime @default(now())
 
-  @@index([walletId, createdAt])
+  @@index([walletId, createdAt, groupId])
 }

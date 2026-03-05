@@ -7,6 +7,7 @@ import { PrismaService } from '../prisma.service.js';
 import { Prisma } from '@prisma/client';
 import { WalletService } from '../wallet/wallet.service.js';
 import { PrismaClient } from '@prisma/client/extension';
+import { v4 as uuid, UUIDTypes } from 'uuid';
 
 @Injectable()
 export class SwapService {
@@ -30,7 +31,7 @@ export class SwapService {
 
     const response = {
       quantidadeDeDestinoEstimada: calculatedValues.finalValue,
-      taxaCobrada: calculatedValues.feeRate,
+      taxaDeConversao: calculatedValues.feeRate,
       cotacaoUsada: new Date().toISOString(),
     };
 
@@ -49,11 +50,13 @@ export class SwapService {
 
     const calculatedValues = calculateSwap(price, data.amount);
 
+    const groupId = uuid();
+
     return (
       this.prisma.$transaction(async (tx) => {
-        await this.swapOut(tx, userId, data);
-        await this.swapFee(tx, userId, data, calculatedValues);
-        await this.swapIn(tx, userId, data, calculatedValues);
+        await this.swapOut(tx, userId, groupId, data);
+        await this.swapFee(tx, userId, groupId, data, calculatedValues);
+        await this.swapIn(tx, userId, groupId, data, calculatedValues);
       }),
       {
         message: 'Conversão concluida com sucesso',
@@ -61,7 +64,12 @@ export class SwapService {
     );
   }
 
-  private async swapOut(tx: PrismaClient, userId: string, data: SwapDto) {
+  private async swapOut(
+    tx: PrismaClient,
+    userId: string,
+    groupId: string,
+    data: SwapDto,
+  ) {
     const coinBalance = await this.walletService.getCoinBalance(
       userId,
       data.tokenOut,
@@ -86,6 +94,7 @@ export class SwapService {
       await tx.transactions.create({
         data: {
           walletId: coinBalance.wallet,
+          groupId,
           amount,
           token: data.tokenOut,
           type: 'SWAP_OUT',
@@ -98,6 +107,7 @@ export class SwapService {
   private async swapFee(
     tx: PrismaClient,
     userId: string,
+    groupId: string,
     data: SwapDto,
     calculatedValues: SwapCalculation,
   ) {
@@ -120,6 +130,7 @@ export class SwapService {
       await tx.transactions.create({
         data: {
           walletId: coinBalance.wallet,
+          groupId,
           amount,
           token: data.tokenIn,
           type: 'SWAP_FEE',
@@ -132,6 +143,7 @@ export class SwapService {
   private async swapIn(
     tx: PrismaClient,
     userId: string,
+    groupId: string,
     data: SwapDto,
     calculatedValues: SwapCalculation,
   ) {
@@ -154,6 +166,7 @@ export class SwapService {
       await tx.transactions.create({
         data: {
           walletId: coinBalance.wallet,
+          groupId,
           amount,
           token: data.tokenIn,
           type: 'SWAP_IN',

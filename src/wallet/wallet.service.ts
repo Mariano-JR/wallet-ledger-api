@@ -5,6 +5,8 @@ import { AppError } from '../common/errors/app.error.js';
 import { Tokens } from '../common/enums/token.enum.js';
 import { WithdrawDto } from './dto/withdraw.dto.js';
 import { Prisma } from '@prisma/client';
+import { groupTransactions } from './helpers/history/group-transactions.helper.js';
+import { mapToHistory } from './helpers/history/map-to-history.helper.js';
 
 @Injectable()
 export class WalletService {
@@ -20,6 +22,38 @@ export class WalletService {
         ethBalance: true,
       },
     });
+  }
+
+  async getExtract(userId: string, page: number, limit: number) {
+    const wallet = await this.prisma.wallet.findUnique({
+      where: { userId },
+    });
+
+    if (!wallet) {
+      throw new AppError('Carteira não encontrada', 404);
+    }
+
+    const transactions = await this.prisma.transactions.findMany({
+      where: { walletId: wallet.walletId },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const grouped = groupTransactions(transactions);
+    const history = mapToHistory(grouped);
+
+    const start = (page - 1) * limit;
+    const end = start + limit;
+
+    const paginated = history.slice(start, end);
+
+    return {
+      data: paginated,
+      meta: {
+        total: history.length,
+        page,
+        lastPage: Math.ceil(history.length / limit),
+      },
+    };
   }
 
   async getCoinBalance(userId: string, token: Tokens) {
