@@ -7,11 +7,25 @@
 ![Tests](https://img.shields.io/badge/tests-vitest-yellow)
 ![Architecture](https://img.shields.io/badge/architecture-modular_nestjs-blue)
 
-API desenvolvida como solução para o desafio técnico backend da Nexus.
+API REST de carteira digital multi-token com arquitetura baseada em ledger, permitindo rastreabilidade completa de transações financeiras.
 
-O sistema simula uma **carteira digital multi-token**, permitindo o gerenciamento de saldos e movimentações financeiras auditáveis.
+## Deploy
 
-Funcionalidades principais:
+API em produção:
+https://SEU-LINK-RENDER
+
+Documentação Swagger:
+https://SEU-LINK-RENDER/docs
+
+## Principais conceitos aplicados
+
+- Ledger financeiro auditável (reconstrução de saldo via histórico)
+- Idempotência em operações críticas
+- Arquitetura modular com NestJS
+- Separação de responsabilidades
+- Tratamento de erros consistente
+
+## Funcionalidades principais:
 
 - Consulta de saldo da carteira
 - Depósitos e saques

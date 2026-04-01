@@ -7,8 +7,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Nexus Teste Prático Backend')
-    .setDescription('API de carteira cripto simplificada')
+    .setTitle('Wallet Ledger API')
+    .setDescription(
+      'API REST de carteira digital multi-token com arquitetura baseada em ledger, permitindo rastreabilidade completa de transações financeiras.',
+    )
     .setVersion('1.0.0')
     .addBearerAuth()
     .build();
