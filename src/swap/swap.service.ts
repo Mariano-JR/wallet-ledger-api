@@ -6,8 +6,7 @@ import { calculateSwap, SwapCalculation } from './domain/swap.calculator.js';
 import { PrismaService } from '../prisma.service.js';
 import { Prisma } from '@prisma/client';
 import { WalletService } from '../wallet/wallet.service.js';
-import { PrismaClient } from '@prisma/client/extension';
-import { v4 as uuid, UUIDTypes } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class SwapService {
@@ -52,20 +51,15 @@ export class SwapService {
 
     const groupId = uuid();
 
-    return (
-      this.prisma.$transaction(async (tx) => {
-        await this.swapOut(tx, userId, groupId, data);
-        await this.swapFee(tx, userId, groupId, data, calculatedValues);
-        await this.swapIn(tx, userId, groupId, data, calculatedValues);
-      }),
-      {
-        message: 'Conversão concluida com sucesso',
-      }
-    );
+    return this.prisma.$transaction(async (tx) => {
+      await this.swapOut(tx, userId, groupId, data);
+      await this.swapFee(tx, userId, groupId, data, calculatedValues);
+      await this.swapIn(tx, userId, groupId, data, calculatedValues);
+    });
   }
 
   private async swapOut(
-    tx: PrismaClient,
+    tx: Prisma.TransactionClient,
     userId: string,
     groupId: string,
     data: SwapDto,
@@ -83,29 +77,29 @@ export class SwapService {
 
     const newBalance = coinBalance.coinToken.balance.minus(amount);
 
-    (await tx.wallet.update({
+    const transactionData: Prisma.TransactionsCreateInput = {
+      wallet: { connect: { walletId: coinBalance.wallet } },
+      groupId,
+      amount: amount,
+      token: data.tokenOut,
+      type: 'SWAP_OUT',
+      previousBalance: coinBalance.coinToken.balance,
+      newBalance: newBalance,
+    };
+
+    await tx.wallet.update({
       where: { walletId: coinBalance.wallet },
       data: {
         [coinBalance.coinToken.type]: {
           decrement: amount,
         },
       },
-    }),
-      await tx.transactions.create({
-        data: {
-          walletId: coinBalance.wallet,
-          groupId,
-          amount,
-          token: data.tokenOut,
-          type: 'SWAP_OUT',
-          previousBalance: coinBalance.coinToken.balance,
-          newBalance,
-        },
-      }));
+    });
+    await tx.transactions.create({ data: transactionData });
   }
 
   private async swapFee(
-    tx: PrismaClient,
+    tx: Prisma.TransactionClient,
     userId: string,
     groupId: string,
     data: SwapDto,
@@ -119,29 +113,29 @@ export class SwapService {
     const amount = new Prisma.Decimal(calculatedValues.feeValue);
     const newBalance = coinBalance.coinToken.balance.minus(amount);
 
-    (await tx.wallet.update({
+    const transactionData: Prisma.TransactionsCreateInput = {
+      wallet: { connect: { walletId: coinBalance.wallet } },
+      groupId,
+      amount: amount,
+      token: data.tokenOut,
+      type: 'SWAP_FEE',
+      previousBalance: coinBalance.coinToken.balance,
+      newBalance: newBalance,
+    };
+
+    await tx.wallet.update({
       where: { walletId: coinBalance.wallet },
       data: {
         [coinBalance.coinToken.type]: {
           decrement: amount,
         },
       },
-    }),
-      await tx.transactions.create({
-        data: {
-          walletId: coinBalance.wallet,
-          groupId,
-          amount,
-          token: data.tokenIn,
-          type: 'SWAP_FEE',
-          previousBalance: coinBalance.coinToken.balance,
-          newBalance,
-        },
-      }));
+    });
+    await tx.transactions.create({ data: transactionData });
   }
 
   private async swapIn(
-    tx: PrismaClient,
+    tx: Prisma.TransactionClient,
     userId: string,
     groupId: string,
     data: SwapDto,
@@ -155,24 +149,26 @@ export class SwapService {
     const amount = new Prisma.Decimal(calculatedValues.grossValue);
     const newBalance = coinBalance.coinToken.balance.plus(amount);
 
-    (await tx.wallet.update({
+    const transactionData: Prisma.TransactionsCreateInput = {
+      wallet: { connect: { walletId: coinBalance.wallet } },
+      groupId,
+      amount: amount,
+      token: data.tokenIn,
+      type: 'SWAP_IN',
+      previousBalance: coinBalance.coinToken.balance,
+      newBalance: newBalance,
+    };
+
+    await tx.wallet.update({
       where: { walletId: coinBalance.wallet },
       data: {
         [coinBalance.coinToken.type]: {
           increment: amount,
         },
       },
-    }),
-      await tx.transactions.create({
-        data: {
-          walletId: coinBalance.wallet,
-          groupId,
-          amount,
-          token: data.tokenIn,
-          type: 'SWAP_IN',
-          previousBalance: coinBalance.coinToken.balance,
-          newBalance,
-        },
-      }));
+    });
+    await tx.transactions.create({ data: transactionData });
+
+    return { message: 'Conversão concluida com sucesso' };
   }
 }

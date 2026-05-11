@@ -2,6 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { Tokens } from '../enums/token.enum.js';
 import { AppError } from '../errors/app.error.js';
 
+interface CoinGeckoDataResponse {
+  [coinId: string]: {
+    [currency: string]: number;
+  };
+}
+
 const tokenMap = {
   BRL: {
     id: 'brazilian-real',
@@ -19,7 +25,7 @@ const tokenMap = {
 
 @Injectable()
 export class CoingeckoService {
-  async getPrice(tokenIn: Tokens, tokenOut: Tokens) {
+  async getPrice(tokenIn: Tokens, tokenOut: Tokens): Promise<number> {
     const coinIn = tokenMap[tokenIn];
     const coinOut = tokenMap[tokenOut];
 
@@ -31,7 +37,7 @@ export class CoingeckoService {
       throw new AppError('Falha ao buscar preço no Coingecko', 400);
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as CoinGeckoDataResponse;
     return data[coinOut.id][coinIn.symbol];
   }
 }

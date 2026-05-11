@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service.js';
 import { AppError } from '../common/errors/app.error.js';

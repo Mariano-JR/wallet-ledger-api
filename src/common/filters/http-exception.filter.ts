@@ -11,7 +11,6 @@ import { AppError } from '../errors/app.error.js';
 export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const req = ctx.getRequest<Request>();
     const res = ctx.getResponse<Response>();
 
     if (exception instanceof AppError) {
