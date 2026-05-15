@@ -1,4 +1,4 @@
-# Nexus Wallet API
+# Wallet API
 ![Node.js](https://img.shields.io/badge/node.js-20-green)
 ![NestJS](https://img.shields.io/badge/nestjs-framework-red)
 ![TypeScript](https://img.shields.io/badge/typescript-language-blue)
