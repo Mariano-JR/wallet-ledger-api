@@ -15,6 +15,7 @@
     "start:prod": "node dist/src/main",
     "lint": "eslint \"{src,apps,libs}/**/*.ts\" --fix",
     "test": "vitest",
+    "test:ci": "vitest run",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
     "test:cov": "vitest --coverage",
